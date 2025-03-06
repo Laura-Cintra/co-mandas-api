@@ -1,5 +1,6 @@
-package  br.com.fiap.co_mandas.model;
+package br.com.fiap.co_mandas.model;
 
+import java.math.BigDecimal;
 import java.util.Random;
 
 public class Dish {
@@ -7,16 +8,16 @@ public class Dish {
     private String name;
     private String description;
     private Category category;
-    private Double price;
-//    private Long id_restaurant;
+    private BigDecimal price;
+    // private Long id_restaurant;
 
-    public Dish(Long id, String name, String description, Double price, Category category) {
-        this.id = Math.abs(new Random().nextLong()); //gerando um id aleatório
+    public Dish(Long id, String name, String description, BigDecimal price, Category category) {
+        this.id = Math.abs(new Random().nextLong()); // gerando um id aleatório
         this.name = name;
         this.description = description;
         this.category = category;
         this.price = price;
-//        this.id_restaurant = id_restaurant;
+        // this.id_restaurant = id_restaurant;
     }
 
     public Long getId() {
@@ -31,7 +32,7 @@ public class Dish {
         return description;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
