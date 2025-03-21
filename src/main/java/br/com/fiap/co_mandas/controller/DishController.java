@@ -1,48 +1,66 @@
 package  br.com.fiap.co_mandas.controller;
 
 import br.com.fiap.co_mandas.model.Dish;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import br.com.fiap.co_mandas.repository.DishRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/dishes")
 public class DishController {
 
-    private List<Dish> repository = new ArrayList<>();
+    private Logger log = LoggerFactory.getLogger(getClass());
 
-    @GetMapping("/dishes")
+    @Autowired // injeção de dependência
+    private DishRepository repository;
+
+    @GetMapping()
     public List<Dish> index(){
-        return repository;
+        return repository.findAll();
     }
 
-    @PostMapping("/dishes")
+    @PostMapping()
     @ResponseStatus(code = HttpStatus.CREATED)
     public Dish create(@RequestBody Dish dish){
-        System.out.println("Cadastrando um prato " + dish.getName());
-        repository.add(dish);
+        log.info("Cadastrando o prato " + dish.getName());
+        repository.save(dish);
         return dish;
     }
 
-    @GetMapping("/dishes/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<Dish> getDishById(@PathVariable Long id) {
-        System.out.println("Buscando prato " + id);
-        var dish = repository.stream().filter(d -> d.getId().equals(id)).findFirst();
-
-        if (dish.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(dish.get());
+        log.info("Buscando prato " + id);
+        return ResponseEntity.ok(getDish(id));
     }
 
-    @DeleteMapping("/dishes/{id}")
+    @DeleteMapping("{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void deleteDishById(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteDishById(@PathVariable Long id) {
         System.out.println("Deletando prato " + id);
-        repository.removeIf(dish -> dish.getId().equals(id));
+        repository.delete(getDish(id));
+        return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("{id}")
+    public ResponseEntity<Object> destroy(@PathVariable Long id, @RequestBody Dish dish){
+        log.info("Atualizando prato" + id);
+
+        getDish(id);
+        dish.setId(id);
+        repository.save(dish);
+        return ResponseEntity.ok(dish);
+    }
+
+    private Dish getDish(Long id){
+        return repository.findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prato não encontrado"));
+    }
 }
