@@ -1,6 +1,7 @@
 package  br.com.fiap.co_mandas.controller;
 
 import br.com.fiap.co_mandas.model.Dish;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import br.com.fiap.co_mandas.repository.DishRepository;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/dishes")
+@CrossOrigin(origins = "http://localhost:3000")
 public class DishController {
 
     private Logger log = LoggerFactory.getLogger(getClass());
@@ -28,7 +31,7 @@ public class DishController {
 
     @PostMapping()
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Dish create(@RequestBody Dish dish){
+    public Dish create(@RequestBody @Valid Dish dish){
         log.info("Cadastrando o prato " + dish.getName());
         repository.save(dish);
         return dish;
@@ -49,7 +52,7 @@ public class DishController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Object> destroy(@PathVariable Long id, @RequestBody Dish dish){
+    public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody @Valid Dish dish){
         log.info("Atualizando prato" + id);
 
         getDish(id);
