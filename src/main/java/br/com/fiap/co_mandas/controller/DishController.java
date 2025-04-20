@@ -1,6 +1,7 @@
 package  br.com.fiap.co_mandas.controller;
 
 import br.com.fiap.co_mandas.model.Dish;
+import br.com.fiap.co_mandas.specification.DishSpecification;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import br.com.fiap.co_mandas.repository.DishRepository;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -24,6 +26,9 @@ import java.util.List;
 public class DishController {
 
     private Logger log = LoggerFactory.getLogger(getClass());
+
+    public record DishFilters(String name, BigDecimal firstPrice, BigDecimal endPrice){}
+
 
     @Autowired
     private DishRepository repository;
@@ -37,7 +42,10 @@ public class DishController {
             }
     )
     @Cacheable("dishes")
-    public List<Dish> index() {
+    public List<Dish> index(
+            DishFilters dishFilters
+    ) {
+        var specification = DishSpecification.withFilters(dishFilters);
         return repository.findAll();
     }
 
