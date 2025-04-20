@@ -10,6 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,11 +46,12 @@ public class DishController {
             }
     )
     @Cacheable("dishes")
-    public List<Dish> index(
-            DishFilters dishFilters
-    ) {
+    public Page<Dish> index(
+            DishFilters dishFilters,
+            @PageableDefault(size = 6, sort = "price", direction = Sort.Direction.ASC) Pageable pageable
+            ) {
         var specification = DishSpecification.withFilters(dishFilters);
-        return repository.findAll();
+        return repository.findAll(specification, pageable);
     }
 
     @PostMapping()

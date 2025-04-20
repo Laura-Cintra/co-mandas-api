@@ -21,11 +21,18 @@ public class DatabaseSeeder {
     @PostConstruct
     public void init() {
         var names = List.of(
-                "Bolo de chocolate", "Filé à parmegiana", "Bruschetta", "Lasanha", "Tiramisu",
-                "Salada Caesar", "Pizza Margherita", "Hambúrguer artesanal", "Risoto de cogumelos",
-                "Tacos mexicanos", "Sushi", "Coxinha", "Pão de alho", "Espaguete à bolonhesa",
-                "Feijoada", "Moqueca", "Panqueca de carne", "Sorvete artesanal", "Creme brûlée", "Quiche Lorraine"
+                "Macarrão ao molho branco", "Macarrão à bolonhesa", "Macarrão ao alho e óleo",
+                "Macarrão com queijo", "Macarrão com frango", "Pizza de calabresa",
+                "Pizza de muçarela", "Pizza marguerita", "Pizza quatro queijos",
+                "Pizza de frango com catupiry", "Hambúrguer artesanal", "Hambúrguer de frango",
+                "Hambúrguer vegetariano", "Hambúrguer com cheddar", "Hambúrguer duplo",
+                "Salada Caesar", "Salada de atum", "Salada tropical", "Salada com frango grelhado",
+                "Salada de folhas verdes", "Frango assado com batatas", "Frango grelhado",
+                "Frango à parmegiana", "Frango xadrez", "Frango ao curry",
+                "Bolo de chocolate", "Bolo de cenoura com cobertura", "Bolo de fubá",
+                "Bolo recheado de morango", "Bolo gelado de coco"
         );
+
 
         var descriptions = List.of(
                 "Delicioso e feito na hora", "Prato especial da casa", "Receita tradicional com um toque moderno",
