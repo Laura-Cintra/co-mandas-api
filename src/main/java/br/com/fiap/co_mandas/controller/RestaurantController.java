@@ -23,7 +23,7 @@ public class RestaurantController {
     }
 
     @GetMapping
-    public List<Restaurant> listar() {
+    public List<Restaurant> index() {
         return repository.findAll();
     }
 
