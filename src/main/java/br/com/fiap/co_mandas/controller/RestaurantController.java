@@ -1,0 +1,40 @@
+package br.com.fiap.co_mandas.controller;
+
+import br.com.fiap.co_mandas.model.Restaurant;
+import br.com.fiap.co_mandas.repository.RestaurantRepository;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/restaurants")
+public class RestaurantController {
+
+    @Autowired
+    private RestaurantRepository repository;
+
+    public RestaurantController(RestaurantRepository repository) {
+        this.repository = repository;
+    }
+
+    @GetMapping
+    public List<Restaurant> listar() {
+        return repository.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Restaurant buscarPorId(@PathVariable Long id) {
+        return repository.findById(id).orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+    }
+
+    @PostMapping
+    public Restaurant create(@RequestBody Restaurant restaurante) {
+        return repository.save(restaurante);
+    }
+
+}
