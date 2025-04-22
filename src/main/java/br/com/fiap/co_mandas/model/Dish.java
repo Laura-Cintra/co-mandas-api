@@ -4,12 +4,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 
 @Entity
@@ -33,5 +33,8 @@ public class Dish {
     @NotNull(message = "O preço não pode ser nulo")
     @DecimalMin(value = "0.01", message = "O preço deve ser maior que zero")
     private BigDecimal price;
-    // private Long id_restaurant;
+
+    @NotNull(message = "Campo obrigatório")
+    @ManyToOne
+    private Restaurant restaurant;
 }
