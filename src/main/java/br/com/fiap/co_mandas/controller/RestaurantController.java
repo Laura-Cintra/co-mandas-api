@@ -1,9 +1,14 @@
 package br.com.fiap.co_mandas.controller;
 
+import br.com.fiap.co_mandas.model.Dish;
 import br.com.fiap.co_mandas.model.Restaurant;
 import br.com.fiap.co_mandas.repository.RestaurantRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,17 +23,13 @@ public class RestaurantController {
     @Autowired
     private RestaurantRepository repository;
 
-    public RestaurantController(RestaurantRepository repository) {
-        this.repository = repository;
-    }
-
     @GetMapping
     public List<Restaurant> index() {
         return repository.findAll();
     }
 
     @GetMapping("/{id}")
-    public Restaurant buscarPorId(@PathVariable Long id) {
+    public Restaurant getRestaurantById(@PathVariable Long id) {
         return repository.findById(id).orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
     }
 

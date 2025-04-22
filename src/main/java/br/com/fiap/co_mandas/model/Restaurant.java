@@ -28,24 +28,25 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "O nome do restaurante não pode estar em branco")
     private String name;
 
-    @NotBlank
-    @Size(min = 10)
+    @NotBlank(message = "A descrição não pode estar em branco")
+    @Size(min = 10, message = "A descrição deve ter pelo menos 10 caracteres")
     private String description;
 
     @ElementCollection
     @CollectionTable(name = "business_hours", joinColumns = @JoinColumn(name = "restaurant_id"))
     private List<String> businessHours;
 
-    @NotBlank
+    @NotBlank(message = "O endereço não pode estar em branco")
     private String address;
 
-    @NotBlank
+    @NotBlank(message = "O CNPJ não pode estar em branco")
+    @Pattern(
+        regexp = "\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}",
+        message = "O CNPJ deve estar no formato 00.000.000/0000-00"
+    )
     private String cnpj;
-
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
-    private List<Dish> dishes;
 
 }
