@@ -22,7 +22,6 @@ import br.com.fiap.co_mandas.repository.DishRepository;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/dishes")
