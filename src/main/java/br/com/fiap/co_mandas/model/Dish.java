@@ -12,6 +12,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Data
 @Builder
@@ -36,5 +38,6 @@ public class Dish {
 
     @NotNull(message = "Campo obrigatório")
     @ManyToOne
+    @JsonIgnore
     private Restaurant restaurant;
 }
