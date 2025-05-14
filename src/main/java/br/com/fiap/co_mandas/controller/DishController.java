@@ -5,6 +5,8 @@ import br.com.fiap.co_mandas.specification.DishSpecification;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +21,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import br.com.fiap.co_mandas.repository.DishRepository;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/dishes")
 @CrossOrigin(origins = "http://localhost:3000")
+@Slf4j
 public class DishController {
-
-    private Logger log = LoggerFactory.getLogger(getClass());
 
     public record DishFilters(String name, BigDecimal firstPrice, BigDecimal endPrice){}
 
