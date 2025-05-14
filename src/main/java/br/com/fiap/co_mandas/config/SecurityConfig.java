@@ -27,8 +27,9 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http.authorizeHttpRequests(
             auth -> auth
-                //.requestMatchers("/restaurants/**").hasRole("ADMIN")
                 .requestMatchers("/login/**").permitAll()
+                .requestMatchers("/restaurants/**").hasRole("ADMIN")
+                // .requestMatchers("/cozinha/**").hasAnyRole("CHEFE", "ADMIN")
                 .anyRequest().authenticated()
         )
         .csrf(csrf -> csrf.disable())
