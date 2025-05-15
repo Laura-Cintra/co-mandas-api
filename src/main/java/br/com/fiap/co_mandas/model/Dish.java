@@ -40,4 +40,8 @@ public class Dish {
     @ManyToOne
     @JsonIgnore
     private Restaurant restaurant;
+
+    @ManyToOne
+    @JsonIgnore
+    private User user;
 }

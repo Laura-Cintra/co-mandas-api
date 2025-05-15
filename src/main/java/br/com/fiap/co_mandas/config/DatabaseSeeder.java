@@ -3,10 +3,13 @@ package br.com.fiap.co_mandas.config;
 import br.com.fiap.co_mandas.model.Category;
 import br.com.fiap.co_mandas.model.Dish;
 import br.com.fiap.co_mandas.model.Restaurant;
+import br.com.fiap.co_mandas.model.User;
 import br.com.fiap.co_mandas.repository.DishRepository;
 import br.com.fiap.co_mandas.repository.RestaurantRepository;
+import br.com.fiap.co_mandas.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -24,12 +27,26 @@ public class DatabaseSeeder {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private List<Restaurant> savedRestaurants;
 
     @PostConstruct
     public void init() {
         seedRestaurants();
         seedDishes();
+        seedUsers();
+    }
+
+    private void seedUsers() {
+        String password = passwordEncoder.encode("12345");
+        var chef = User.builder().email("chef@gmail.com.br").password(password).build();
+        var waiter = User.builder().email("waiter@gmail.com.br").password(password).build();
+        userRepository.saveAll(List.of(chef, waiter));
     }
 
     private void seedRestaurants() {
@@ -82,6 +99,10 @@ public class DatabaseSeeder {
             savedRestaurants = restaurantRepository.findAll();
         }
 
+        var users = userRepository.findAll();
+        var chef = users.stream().filter(u -> u.getEmail().equals("chef@gmail.com.br")).findFirst().orElse(null);
+        // var waiter = users.stream().filter(u -> u.getEmail().equals("waiter@gmail.com.br")).findFirst().orElse(null);
+
         var names = List.of(
                 "Macarrão ao molho branco", "Macarrão à bolonhesa", "Macarrão ao alho e óleo",
                 "Macarrão com queijo", "Macarrão com frango", "Pizza de calabresa",
@@ -111,6 +132,7 @@ public class DatabaseSeeder {
             var category = categories[random.nextInt(categories.length)];
             var price = BigDecimal.valueOf(10 + (100 - 10) * random.nextDouble()).setScale(2, RoundingMode.HALF_UP);
             var restaurant = savedRestaurants.get(random.nextInt(savedRestaurants.size()));
+            // var user = random.nextBoolean() ? chef : waiter; // Associa o prato a um dos dois usuários
 
             dishes.add(Dish.builder()
                     .name(name)
@@ -118,9 +140,11 @@ public class DatabaseSeeder {
                     .category(category)
                     .price(price)
                     .restaurant(restaurant)
+                    .user(chef)
                     .build());
         }
 
         dishRepository.saveAll(dishes);
+        System.out.println("Pratos salvos: " + dishRepository.count());
     }
 }

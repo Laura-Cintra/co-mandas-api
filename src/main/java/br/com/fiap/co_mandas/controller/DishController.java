@@ -1,14 +1,13 @@
 package  br.com.fiap.co_mandas.controller;
 
 import br.com.fiap.co_mandas.model.Dish;
+import br.com.fiap.co_mandas.model.User;
 import br.com.fiap.co_mandas.specification.DishSpecification;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import br.com.fiap.co_mandas.repository.DishRepository;
@@ -31,7 +31,6 @@ import java.math.BigDecimal;
 public class DishController {
 
     public record DishFilters(String name, BigDecimal firstPrice, BigDecimal endPrice){}
-
 
     @Autowired
     private DishRepository repository;
@@ -47,9 +46,11 @@ public class DishController {
     @Cacheable("dishes")
     public Page<Dish> index(
             DishFilters dishFilters,
+            @AuthenticationPrincipal User user,
             @PageableDefault(size = 6, sort = "price", direction = Sort.Direction.ASC) Pageable pageable
             ) {
-        var specification = DishSpecification.withFilters(dishFilters);
+        var specification = DishSpecification.withFilters(dishFilters).and((root, query, cb) ->
+        cb.equal(root.get("user").get("email"), user.getEmail()));
         return repository.findAll(specification, pageable);
     }
 
@@ -64,10 +65,10 @@ public class DishController {
             }
     )
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Dish create(@RequestBody @Valid Dish dish) {
+    public Dish create(@RequestBody @Valid Dish dish,@AuthenticationPrincipal User user) {
         log.info("Cadastrando o prato " + dish.getName());
-        repository.save(dish);
-        return dish;
+        dish.setUser(user);
+        return repository.save(dish);
     }
 
     @GetMapping("{id}")
@@ -79,9 +80,9 @@ public class DishController {
                     @ApiResponse(responseCode = "404", description = "Prato com o ID especificado não encontrado")
             }
     )
-    public ResponseEntity<Dish> getDishById(@PathVariable Long id) {
+    public ResponseEntity<Dish> getDishById(@PathVariable Long id, @AuthenticationPrincipal User user) {
         log.info("Buscando prato " + id);
-        return ResponseEntity.ok(getDish(id));
+        return ResponseEntity.ok(getDish(id, user));
     }
 
     @DeleteMapping("{id}")
@@ -95,9 +96,9 @@ public class DishController {
     )
     @CacheEvict(value = "dishes", allEntries = true)
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public ResponseEntity<Object> deleteDishById(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteDishById(@PathVariable Long id, @AuthenticationPrincipal User user) {
         log.info("Deletando prato " + id);
-        repository.delete(getDish(id));
+        repository.delete(getDish(id, user));
         return ResponseEntity.noContent().build();
     }
 
@@ -112,17 +113,20 @@ public class DishController {
             }
     )
     @CacheEvict(value = "dishes", allEntries = true)
-    public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody @Valid Dish dish) {
+    public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody @Valid Dish dish, @AuthenticationPrincipal User user) {
         log.info("Atualizando prato " + id);
-        getDish(id);
+        getDish(id, user);
         dish.setId(id);
         repository.save(dish);
         return ResponseEntity.ok(dish);
     }
 
-    private Dish getDish(Long id){
-        return repository.findById(id)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Prato não encontrado"));
+    private Dish getDish(Long id, User user) {
+        var dish = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prato não encontrado"));
+        if (!dish.getUser().equals(user)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        return dish;
     }
 }
