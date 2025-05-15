@@ -12,7 +12,6 @@ import br.com.fiap.co_mandas.model.Token;
 import br.com.fiap.co_mandas.model.User;
 import br.com.fiap.co_mandas.service.TokenService;
 
-
 @RestController
 public class AuthController {
     

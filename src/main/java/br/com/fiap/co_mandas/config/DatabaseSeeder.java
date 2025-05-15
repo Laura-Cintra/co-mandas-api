@@ -1,19 +1,23 @@
 package br.com.fiap.co_mandas.config;
 
-import br.com.fiap.co_mandas.model.Category;
-import br.com.fiap.co_mandas.model.Dish;
-import br.com.fiap.co_mandas.model.Restaurant;
-import br.com.fiap.co_mandas.repository.DishRepository;
-import br.com.fiap.co_mandas.repository.RestaurantRepository;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import br.com.fiap.co_mandas.model.Category;
+import br.com.fiap.co_mandas.model.Dish;
+import br.com.fiap.co_mandas.model.Restaurant;
+import br.com.fiap.co_mandas.model.User;
+import br.com.fiap.co_mandas.repository.DishRepository;
+import br.com.fiap.co_mandas.repository.RestaurantRepository;
+import br.com.fiap.co_mandas.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class DatabaseSeeder {
@@ -24,15 +28,26 @@ public class DatabaseSeeder {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private List<Restaurant> savedRestaurants;
 
     @PostConstruct
     public void init() {
-        seedRestaurants();
-        seedDishes();
-    }
 
-    private void seedRestaurants() {
+        // Users
+
+        String password = passwordEncoder.encode("12345");
+        var chef = User.builder().email("chef@gmail.com.br").password(password).build();
+        var waiter = User.builder().email("waiter@gmail.com.br").password(password).build();
+        userRepository.saveAll(List.of(chef, waiter));
+
+        // Restaurants
+
         if (restaurantRepository.count() > 0) {
             savedRestaurants = restaurantRepository.findAll();
             return;
@@ -45,8 +60,7 @@ public class DatabaseSeeder {
                 "Quinta-feira: 13:00 - 22:00",
                 "Sexta-feira: 13:00 - 23:00",
                 "Sábado: 12:00 - 23:00",
-                "Domingo: 12:00 - 22:00"
-        );
+                "Domingo: 12:00 - 22:00");
 
         List<Restaurant> restaurants = List.of(
                 Restaurant.builder()
@@ -55,6 +69,7 @@ public class DatabaseSeeder {
                         .businessHours(businessHours)
                         .address("Vila Medeiros, zona norte de São Paulo.")
                         .cnpj("46.179.149/0004-23")
+                        .user(chef)
                         .build(),
 
                 Restaurant.builder()
@@ -63,6 +78,7 @@ public class DatabaseSeeder {
                         .businessHours(businessHours)
                         .address("Rua das Palmeiras, 123 - Recife, PE")
                         .cnpj("12.345.678/0001-99")
+                        .user(waiter)
                         .build(),
 
                 Restaurant.builder()
@@ -71,13 +87,13 @@ public class DatabaseSeeder {
                         .businessHours(businessHours)
                         .address("Av. Paulista, 900 - São Paulo, SP")
                         .cnpj("98.765.432/0001-11")
-                        .build()
-        );
+                        .user(chef)
+                        .build());
 
         savedRestaurants = restaurantRepository.saveAll(restaurants);
-    }
 
-    private void seedDishes() {
+        // Dishes
+
         if (savedRestaurants == null || savedRestaurants.isEmpty()) {
             savedRestaurants = restaurantRepository.findAll();
         }
@@ -92,14 +108,12 @@ public class DatabaseSeeder {
                 "Salada de folhas verdes", "Frango assado com batatas", "Frango grelhado",
                 "Frango à parmegiana", "Frango xadrez", "Frango ao curry",
                 "Bolo de chocolate", "Bolo de cenoura com cobertura", "Bolo de fubá",
-                "Bolo recheado de morango", "Bolo gelado de coco"
-        );
+                "Bolo recheado de morango", "Bolo gelado de coco");
 
         var descriptions = List.of(
                 "Delicioso e feito na hora", "Prato especial da casa", "Receita tradicional com um toque moderno",
                 "Muito sabor e crocância", "Ideal para compartilhar", "Leve e saudável", "Para quem ama doces",
-                "Opção vegetariana", "Clássico que nunca sai de moda", "Feito com ingredientes frescos"
-        );
+                "Opção vegetariana", "Clássico que nunca sai de moda", "Feito com ingredientes frescos");
 
         var categories = Category.values();
         var random = new Random();

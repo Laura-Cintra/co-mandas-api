@@ -40,11 +40,13 @@ public class User implements UserDetails{
     @Size(min = 5)
     private String password;
 
-    private RoleType role;
+    // @Enumerated(Enum.type.STRING)
+    // private RoleType role;
+    // return List.of(new SimpleGrantedAuthority(role.name()));
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority("ADMIN"));
     }
 
     @Override
