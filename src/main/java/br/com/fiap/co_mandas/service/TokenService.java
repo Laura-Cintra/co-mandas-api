@@ -34,22 +34,14 @@ public class TokenService {
         return new Token(jwt, user.getEmail());
     }
 
-    // public User getUserFromToken(String token){
-
-    // // verificando se o token foi válido
-    // var verifiedToken = JWT.require(algorithm).build().verify(token);
-
-    // return User.builder()
-    // .id(Long.valueOf(verifiedToken.getSubject()))
-    // .email(verifiedToken.getClaim("email").toString())
-    // .build();
-    // }
-
     public User getUserFromToken(String token) {
-        var verifiedToken = JWT.require(algorithm).build().verify(token);
-        String email = verifiedToken.getClaim("email").asString();
 
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        // verificando se o token foi válido
+        var verifiedToken = JWT.require(algorithm).build().verify(token);
+
+        return User.builder()
+                .id(Long.valueOf(verifiedToken.getSubject()))
+                .email(verifiedToken.getClaim("email").toString())
+                .build();
     }
 }
