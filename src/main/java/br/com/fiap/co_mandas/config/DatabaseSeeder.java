@@ -42,6 +42,8 @@ public class DatabaseSeeder {
         // Users
 
         String password = passwordEncoder.encode("12345");
+        // var chef =
+        // User.builder().email("chef@gmail.com.br").password(password).role("CHEF").build();
         var chef = User.builder().email("chef@gmail.com.br").password(password).build();
         var waiter = User.builder().email("waiter@gmail.com.br").password(password).build();
         userRepository.saveAll(List.of(chef, waiter));
