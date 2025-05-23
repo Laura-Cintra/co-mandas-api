@@ -43,6 +43,5 @@ public class Dish {
 
     @NotNull(message = "Campo obrigatório")
     @ManyToOne
-    @JsonIgnore
     private Restaurant restaurant;
 }
